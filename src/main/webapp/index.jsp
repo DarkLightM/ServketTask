@@ -22,15 +22,15 @@
 <body>
 <br>
 <%= LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")) %>
-<h1>Текущая папка <%= request.getParameter("path") %></h1>
-<h2> <a href='?path=<%= request.getAttribute("parentPath") %>'> Назад </a> </h2>
+<h1><%= request.getParameter("path") %></h1>
+<h2> <a href='?path=<%= request.getAttribute("parentPath") %>'> back </a> </h2>
 
 <table>
     <tr>
-        <th>Тип</th>
-        <th>Имя</th>
-        <th>Размер</th>
-        <th>Дата</th>
+        <th>Type</th>
+        <th>Name</th>
+        <th>Size</th>
+        <th>Date</th>
     </tr>
     <% for (File item : filesList) { %>
     <tr>
@@ -57,5 +57,10 @@
     </tr>
     <% } %>
 </table>
+<form method="POST" action="logout">
+    <div>
+        <input type="submit" value="Logout">
+    </div>
+</form>
 </body>
 </html>

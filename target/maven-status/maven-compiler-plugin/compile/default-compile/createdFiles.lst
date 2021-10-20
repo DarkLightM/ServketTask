@@ -1,2 +1,8 @@
-ulearnTask\MainServlet$1.class
-ulearnTask\MainServlet.class
+profiles\Profile.class
+servlets\Browse.class
+profiles\AccountService.class
+servlets\DownloadFIle.class
+servlets\Logout.class
+servlets\Browse$1.class
+servlets\LogIn.class
+servlets\Registration.class

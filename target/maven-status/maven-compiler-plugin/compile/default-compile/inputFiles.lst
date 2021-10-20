@@ -1,1 +1,7 @@
-D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\ulearnTask\MainServlet.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\servlets\Registration.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\servlets\Browse.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\profiles\Profile.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\profiles\AccountService.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\servlets\DownloadFIle.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\servlets\Logout.java
+D:\IntelliJ IDEA Community Edition 2020.3.2\ServletTask\src\main\java\servlets\LogIn.java
