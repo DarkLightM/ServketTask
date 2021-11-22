@@ -1,5 +1,7 @@
 package servlets;
 
+import Database.DatabaseException;
+import Database.DatabaseService;
 import profiles.AccountService;
 import profiles.Profile;
 
@@ -15,28 +17,59 @@ import java.nio.file.Paths;
 
 @WebServlet(urlPatterns = "/registration")
 public class Registration extends HttpServlet {
+    private DatabaseService dbService = new DatabaseService();
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String login = req.getParameter("login");
-        String pass = req.getParameter("pass");
+        String password = req.getParameter("pass");
         String email = req.getParameter("email");
-        if (    login == null || login.equals("") ||
-                pass  == null || pass.equals("") ||
-                email == null || email.equals("")){
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            resp.sendRedirect("/registration.jsp");
-            return;
+
+        clearErrors(req);
+
+        boolean errorStatus = false;
+        try {
+            errorStatus = checkErrors(req, login, password, email);
+        } catch (DatabaseException e){
+            e.printStackTrace();
         }
-        Path userDirectoryPath = Paths.get(AccountService.getHomeDirectory().toString() + '\\' + login);
-        if (Files.exists(userDirectoryPath)){
-            resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
-            return;
+
+        if (errorStatus) {
+            req.setAttribute("login", login);
+            req.setAttribute("pass1", password);
+            req.setAttribute("email", email);
+            req.getRequestDispatcher("registration.jsp").forward(req, resp);
+        } else {
+            Profile userProfile = new Profile(login, password, email);
+            try {
+                dbService.addUser(userProfile);
+            } catch (DatabaseException e) {
+                e.printStackTrace();
+            }
+            Path userDirectoryPath = Paths.get(AccountService.getHomeDirectory().toString() + '\\' + login);
+            Files.createDirectory(userDirectoryPath);
+            resp.sendRedirect("/");
         }
-        Files.createDirectory(userDirectoryPath);
-        Profile profile = new Profile(login, pass, email);
-        AccountService.addNewUser(profile);
-        AccountService.addSession(req.getSession().getId(), profile);
-        resp.setStatus(HttpServletResponse.SC_OK);
-        resp.sendRedirect("/");
+    }
+
+    private boolean checkErrors(HttpServletRequest req, String login, String firstPassword,
+                                String email) throws DatabaseException {
+
+        if (login == null || login.equals("")) {
+            req.setAttribute("loginErr", "Поле не заполнено");
+        } else if (firstPassword == null || firstPassword.equals("")) {
+            req.setAttribute("pass1Err", "Поле не заполнено");
+        } else if (email == null || email.equals("")) {
+            req.setAttribute("emailErr", "Поле не заполнено");
+        } else if (dbService.getUser(login).getLogin() != null) {
+            req.setAttribute("loginErr", "Данный логин уже существует");
+        } else return false;
+        return true;
+    }
+
+    private void clearErrors(HttpServletRequest req) {
+        req.setAttribute("loginErr", "");
+        req.setAttribute("pass1Err", "");
+        req.setAttribute("pass2Err", "");
+        req.setAttribute("emailErr", "");
     }
 }
