@@ -11,12 +11,9 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 
 @WebServlet(urlPatterns = "/login")
 public class LogIn extends HttpServlet {
-    private AccountService accountService = new AccountService();
     private DatabaseService dbService = new DatabaseService();
 
     @Override
@@ -29,33 +26,26 @@ public class LogIn extends HttpServlet {
         String login = req.getParameter("login");
         String password = req.getParameter("pass");
         clearErrors(req);
-
-
         boolean errorStatus = false;
         try {
             errorStatus = checkErrors(req, login, password);
         } catch (DatabaseException e) {
             e.printStackTrace();
         }
-
         if (errorStatus) {
             req.setAttribute("login", login);
             req.setAttribute("pass", password);
             req.getRequestDispatcher("login.jsp").forward(req, resp);
         } else {
             Profile profile = null;
-            try {
-                profile = dbService.getUser(login);
-            } catch (DatabaseException e) {
-                e.printStackTrace();
-            }
-            accountService.addSession(req.getSession().getId(), profile);
+            profile = dbService.getUser(login);
+            AccountService.addSession(req.getSession().getId(), profile);
             resp.sendRedirect("/");
         }
     }
+
     private boolean checkErrors (HttpServletRequest req, String login, String password) throws
             DatabaseException {
-
         if (login == null || login.equals("")) {
             req.setAttribute("loginErr", "Поле не заполнено");
         } else if (password == null || password.equals("")) {

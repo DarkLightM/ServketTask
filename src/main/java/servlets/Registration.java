@@ -23,28 +23,21 @@ public class Registration extends HttpServlet {
         String login = req.getParameter("login");
         String password = req.getParameter("pass");
         String email = req.getParameter("email");
-
         clearErrors(req);
-
         boolean errorStatus = false;
         try {
             errorStatus = checkErrors(req, login, password, email);
         } catch (DatabaseException e){
             e.printStackTrace();
         }
-
         if (errorStatus) {
             req.setAttribute("login", login);
-            req.setAttribute("pass1", password);
+            req.setAttribute("pass", password);
             req.setAttribute("email", email);
             req.getRequestDispatcher("registration.jsp").forward(req, resp);
         } else {
             Profile userProfile = new Profile(login, password, email);
-            try {
-                dbService.addUser(userProfile);
-            } catch (DatabaseException e) {
-                e.printStackTrace();
-            }
+            dbService.addUser(userProfile);
             Path userDirectoryPath = Paths.get(AccountService.getHomeDirectory().toString() + '\\' + login);
             Files.createDirectory(userDirectoryPath);
             resp.sendRedirect("/");
@@ -53,23 +46,19 @@ public class Registration extends HttpServlet {
 
     private boolean checkErrors(HttpServletRequest req, String login, String firstPassword,
                                 String email) throws DatabaseException {
-
         if (login == null || login.equals("")) {
             req.setAttribute("loginErr", "Поле не заполнено");
         } else if (firstPassword == null || firstPassword.equals("")) {
-            req.setAttribute("pass1Err", "Поле не заполнено");
+            req.setAttribute("passErr", "Поле не заполнено");
         } else if (email == null || email.equals("")) {
             req.setAttribute("emailErr", "Поле не заполнено");
-        } else if (dbService.getUser(login).getLogin() != null) {
-            req.setAttribute("loginErr", "Данный логин уже существует");
         } else return false;
         return true;
     }
 
     private void clearErrors(HttpServletRequest req) {
         req.setAttribute("loginErr", "");
-        req.setAttribute("pass1Err", "");
-        req.setAttribute("pass2Err", "");
+        req.setAttribute("passErr", "");
         req.setAttribute("emailErr", "");
     }
 }

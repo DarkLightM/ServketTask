@@ -14,7 +14,7 @@ import java.io.OutputStream;
 @WebServlet(urlPatterns = "/download")
 public class DownloadFIle extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
 
         String filePath = req.getParameter("path");
         File downloadFile = new File(filePath);

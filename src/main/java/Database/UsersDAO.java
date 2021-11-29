@@ -1,42 +1,47 @@
 package Database;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import profiles.Profile;
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import profiles.UsersDataSet;
 
 public class UsersDAO {
 
-    private Executor executor;
+    private final Session session;
 
-    public UsersDAO(Connection connection) {
-        this.executor = new Executor(connection);
+    public UsersDAO(Session session) {
+        this.session = session;
     }
 
-    public Profile getUser(String login) throws SQLException {
-        return executor.execQuery("select * from users where user_login='" + login + "'", result -> {
-            result.next();
-            return new Profile(result.getString(2),
-                    result.getString(3),
-                    result.getString(4));
-        });
+    public Profile getUserProfile(String login) throws HibernateException {
+        Criteria criteria = session.createCriteria(UsersDataSet.class);
+        UsersDataSet usersDataSet = (UsersDataSet) criteria
+                .add(Restrictions.eq("login", login))
+                .uniqueResult();
+
+        if (usersDataSet == null) {
+            throw new RuntimeException("User with this login not found");
+        }
+        return new Profile(usersDataSet.getLogin(),
+                usersDataSet.getPass(),
+                usersDataSet.getEmail());
     }
 
-    public boolean checkUserExists(String login) throws SQLException {
-        return executor.execQuery("select exists (select * from users where user_login='" + login + "')", result -> {
-            result.next();
-            return result.getBoolean(1);
-        });
+    public void insertUser(Profile userProfile) throws HibernateException {
+        session.save(new UsersDataSet(userProfile));
     }
 
-    public void insertUser(String login, String password, String email) throws SQLException {
-        executor.execUpdate("insert into users (user_login, user_pass, user_email) values ('" + login + "', '" + password + "', '" + email + "')");
-    }
-
-    public void createTable() throws SQLException {
-        executor.execUpdate("create table if not exists users (id bigint auto_increment primary key, user_login varchar(255), user_pass varchar(255), user_email varchar(255))");
-    }
-
-    public void dropTable() throws SQLException {
-        executor.execUpdate("drop table users");
+    public boolean checkUserExists(String login) {
+        try {
+            getUserProfile(login);
+        } catch (Exception e) {
+            if (!e.getMessage().equals("User with this login not found")) {
+                throw new RuntimeException(e.getMessage());
+            }
+            return false;
+        }
+        return true;
     }
 }

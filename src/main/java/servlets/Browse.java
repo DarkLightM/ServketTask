@@ -27,10 +27,10 @@ public class Browse extends HttpServlet {
         String path = req.getParameter("path");
         if (userProfile == null){
             resp.sendRedirect("/login");
-        }
+        } else
         if (path == null || path.equals("")) {
             path = AccountService.getHomeDirectory().toString() + '\\' + userProfile.getLogin();
-        }
+        } else
         if (!path.startsWith(AccountService.getHomeDirectory().toString() + '\\' + userProfile.getLogin())){
             resp.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;

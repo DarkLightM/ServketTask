@@ -1,5 +1,9 @@
+Database\DatabaseService.class
+Database\UsersDAO.class
+Database\DatabaseException.class
 profiles\Profile.class
 servlets\Browse.class
+profiles\UsersDataSet.class
 profiles\AccountService.class
 servlets\DownloadFIle.class
 servlets\Logout.class
